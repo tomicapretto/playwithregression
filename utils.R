@@ -4,6 +4,7 @@ data_to_json = function(data) {
   )
 } 
 
+# Utility function to get grid rows
 ui_row = function(...) {
   tags$div(
     class = "ui grid",
@@ -14,6 +15,7 @@ ui_row = function(...) {
   )
 }
 
+# Utility function to get grid columns
 ui_col = function(width, ...) {
   opts = c("one", "two", "three", "four", "five", "six", "seven", "eight",
            "nine", "ten", "eleven", "twelve", "thirtheen", "fourteen",
@@ -25,6 +27,8 @@ ui_col = function(width, ...) {
   )
 }
 
+# Custom range input. Like default slider, but with custom styles.
+# See source code at 'www/range-input/binding.js'.
 rangeInput = function(inputId, value = 20, min = 0, max = 100, step = 1) {
   form = tags$div(
     class = "range-input",
@@ -33,7 +37,13 @@ rangeInput = function(inputId, value = 20, min = 0, max = 100, step = 1) {
       tags$div(
         class = "range-input-controls",
         tags$div(class = "range-value"),
-        tags$input(type = "range", min = min, max = max, value = value, step = step)
+        tags$input(
+          type = "range", 
+          min = min, 
+          max = max, 
+          value = value, 
+          step = step
+        )
       )
     )
   )
@@ -47,7 +57,10 @@ rangeInput = function(inputId, value = 20, min = 0, max = 100, step = 1) {
   htmltools::attachDependencies(form, deps)
 }
 
-updateRangeInput = function(id, value, session = shiny::getDefaultReactiveDomain()) {
+# Updater for the custom range input. 
+# It only updates the value, which is enough for this app.
+updateRangeInput = function(id, value, 
+                            session = shiny::getDefaultReactiveDomain()) {
   message = list(value = round(value, 2))
   session$sendInputMessage(id, message)
 }

@@ -1,3 +1,12 @@
+# This R6 class stores data and behavior related to the regression fit.
+# `self$data` is a `reactiveValues()` object, so changes within these objects
+# update the plot.
+
+# scatter: Coordinates of the points
+# line: Coordinates of the fitted line.
+# rect: Coordinates and dimensions of the squares.
+# model: Regression coefficients.
+
 RegressionData = R6::R6Class(
   "RegressionData",
   public = list(
@@ -14,6 +23,7 @@ RegressionData = R6::R6Class(
       self$data[["model"]] = list("coefficients" = c(0, 0))
     },
     
+    # Add a new point and recompute model, fit, and rects.
     add_point = function(coords) {
       if (is.null(coords)) return(NULL)
       isolate({
@@ -26,12 +36,14 @@ RegressionData = R6::R6Class(
       })
     },
     
+    # Fit linear regression via OLS using points in data[["scatter"]]
     compute_model = function() {
       self$data[["model"]] = lm(y ~ x, data = self$data[["scatter"]])
     },
     
+    # Compute the coordinates of the line that is shown in the plot.
     compute_line = function() {
-      # To avoid plotting below the axis, I need to compute the line twice
+      # Avoid plotting outside the plot region delimited by x=[0, 10] y=[0, 10]
       intercept = self$get_intercept()
       slope = self$get_slope()
       y = intercept +  slope * self$bgrid
@@ -52,6 +64,7 @@ RegressionData = R6::R6Class(
       self$data[["line"]] = data
     },
     
+    # Compute the coordinates and dimensions of the squares.
     compute_rects = function() {
       pred = self$get_intercept() + self$get_slope() * self$data[["scatter"]]$x
       self$data[["rect"]]  = data.frame(
@@ -66,6 +79,7 @@ RegressionData = R6::R6Class(
       )
     },
     
+    # Add n random points and re-compute model, line, and squares.
     add_random_points = function(n=5) {
       df_n = nrow(self$data[["scatter"]])
       x = runif(n, 2, 8)
@@ -81,6 +95,7 @@ RegressionData = R6::R6Class(
       })
     },
     
+    # Shake existing points, re-compute model, line, and squares.
     shake = function() {
       n = nrow(self$data[["scatter"]])
       isolate({
@@ -94,6 +109,7 @@ RegressionData = R6::R6Class(
       })
     },
     
+    # Delete points, line, and squares.
     clear = function() {
       self$data[["scatter"]] = data.frame(x = numeric(0), y = numeric(0))
       self$data[["line"]] = data.frame(x = numeric(0), y = numeric(0))
@@ -103,31 +119,37 @@ RegressionData = R6::R6Class(
       self$data[["model"]] = list("coefficients" = c(0, 0))
     },
     
+    # Return `self$data` as a list, without including "model".
     get_data_list = function() {
       data = reactiveValuesToList(self$data)
       data[names(data) != "model"]
     },
     
+    # Return the value of the intercept of the fitted line
     get_intercept = function() {
       self$data[["model"]]$coefficients[[1]]
     },
     
+    # Return the value of the slope of the fitted line
     get_slope = function() {
       self$data[["model"]]$coefficients[[2]]
     },
     
+    # Replace existing intercept with a new value, recompute line and squares.
     set_intercept = function(x) {
       self$data[["model"]]$coefficients[[1]] = x
       self$compute_line()
       self$compute_rects()
     },
     
+    # Replace existing slope with a new value, recompute line and squares.
     set_slope = function(x) {
       self$data[["model"]]$coefficients[[2]] = x
       self$compute_line()
       self$compute_rects()
     },
     
+    # Trigger OLS fit. Useful when intercept and/or slope are manipulated.
     set_ols_fit = function() {
       if (nrow(self$data[["rect"]]) > 0) { 
         self$compute_model()
@@ -136,6 +158,7 @@ RegressionData = R6::R6Class(
       }
     },
     
+    # Get sum of squares
     get_error = function() {
       if (nrow(self$data[["rect"]]) > 0) {
         sum(self$data[["rect"]]$height ^ 2)

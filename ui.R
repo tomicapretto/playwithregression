@@ -129,6 +129,7 @@ sidebar = function() {
   )
 }
 
+
 body = function() {
   tags$div(
     style = "margin-left: 260px",
@@ -147,9 +148,7 @@ body = function() {
 
 ui = function() {
   shiny.semantic::semanticPage(
-    tags$head(
-      shiny::includeCSS("www/style.css")
-    ),
+    tags$head(shiny::includeCSS("www/style.css")),
     shinyjs::useShinyjs(),
     sidebar(),
     body()
