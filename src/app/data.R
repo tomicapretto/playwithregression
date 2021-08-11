@@ -7,7 +7,7 @@
 # rect: Coordinates and dimensions of the squares.
 # model: Regression coefficients.
 
-RegressionData = R6::R6Class(
+RegressionData <- R6::R6Class(
   "RegressionData",
   public = list(
     bgrid = seq(0, 10, length.out = 100), # base grid
@@ -15,12 +15,12 @@ RegressionData = R6::R6Class(
     data = reactiveValues(),
     
     initialize = function() {
-      self$data[["scatter"]] = data.frame(x = numeric(0), y = numeric(0))
-      self$data[["line"]] = data.frame(x = numeric(0), y = numeric(0))
-      self$data[["rect"]] = data.frame(
-        x = numeric(0), y = numeric(0), width = numeric(0), height = numeric(0)
+      self$data[["scatter"]] <- data.frame(x = numeric(0), y = numeric(0))
+      self$data[["line"]] <- data.frame(x = numeric(0), y = numeric(0))
+      self$data[["rect"]] <- data.frame(
+        x = numeric(0), y <- numeric(0), width = numeric(0), height = numeric(0)
       )
-      self$data[["model"]] = list("coefficients" = c(0, 0))
+      self$data[["model"]] <- list("coefficients" = c(0, 0))
     },
     
     # Add a new point and recompute model, fit, and rects.
@@ -38,25 +38,25 @@ RegressionData = R6::R6Class(
     
     # Fit linear regression via OLS using points in data[["scatter"]]
     compute_model = function() {
-      self$data[["model"]] = lm(y ~ x, data = self$data[["scatter"]])
+      self$data[["model"]] <- lm(y ~ x, data = self$data[["scatter"]])
     },
     
     # Compute the coordinates of the line that is shown in the plot.
     compute_line = function() {
       # Avoid plotting outside the plot region delimited by x=[0, 10] y=[0, 10]
-      intercept = self$get_intercept()
-      slope = self$get_slope()
-      y = intercept +  slope * self$bgrid
+      intercept <- self$get_intercept()
+      slope <- self$get_slope()
+      y <- intercept +  slope * self$bgrid
       
       if (sum(y > 0 & y < 10) > 0) {
-        range_bgrid = range(self$bgrid[y > 0 & y < 10])
-        self$grid = seq(range_bgrid[1], range_bgrid[2], length.out = 100)
-        data = data.frame(
+        range_bgrid <- range(self$bgrid[y > 0 & y < 10])
+        self$grid <- seq(range_bgrid[1], range_bgrid[2], length.out = 100)
+        data <- data.frame(
           x = self$grid,
           y = intercept + slope * self$grid
         )
       } else {
-        data = data.frame(
+        data <- data.frame(
           x = numeric(0),
           y = numeric(0)
         )
@@ -66,8 +66,8 @@ RegressionData = R6::R6Class(
     
     # Compute the coordinates and dimensions of the squares.
     compute_rects = function() {
-      pred = self$get_intercept() + self$get_slope() * self$data[["scatter"]]$x
-      self$data[["rect"]]  = data.frame(
+      pred <- self$get_intercept() + self$get_slope() * self$data[["scatter"]]$x
+      self$data[["rect"]] <- data.frame(
         x = self$data[["scatter"]]$x,
         y = ifelse(
           pred >= self$data[["scatter"]]$y, 
@@ -81,9 +81,9 @@ RegressionData = R6::R6Class(
     
     # Add n random points and re-compute model, line, and squares.
     add_random_points = function(n=5) {
-      df_n = nrow(self$data[["scatter"]])
-      x = runif(n, 2, 8)
-      y = 5 + x * rnorm(1, 0, 0.3) + rnorm(n)
+      df_n <- nrow(self$data[["scatter"]])
+      x <- runif(n, 2, 8)
+      y <- 5 + x * rnorm(1, 0, 0.3) + rnorm(n)
       isolate({
         self$data[["scatter"]] = rbind(
           self$data[["scatter"]], 
@@ -97,7 +97,7 @@ RegressionData = R6::R6Class(
     
     # Shake existing points, re-compute model, line, and squares.
     shake = function() {
-      n = nrow(self$data[["scatter"]])
+      n <- nrow(self$data[["scatter"]])
       isolate({
         if (n >= 1) {
           self$data[["scatter"]]$x = shake(self$data[["scatter"]]$x, 0.2)
@@ -111,17 +111,17 @@ RegressionData = R6::R6Class(
     
     # Delete points, line, and squares.
     clear = function() {
-      self$data[["scatter"]] = data.frame(x = numeric(0), y = numeric(0))
-      self$data[["line"]] = data.frame(x = numeric(0), y = numeric(0))
-      self$data[["rect"]] = data.frame(
+      self$data[["scatter"]] <- data.frame(x = numeric(0), y = numeric(0))
+      self$data[["line"]] <- data.frame(x = numeric(0), y = numeric(0))
+      self$data[["rect"]] <- data.frame(
         x = numeric(0), y = numeric(0), width = numeric(0), height = numeric(0)
       )
-      self$data[["model"]] = list("coefficients" = c(0, 0))
+      self$data[["model"]] <- list("coefficients" = c(0, 0))
     },
     
     # Return `self$data` as a list, without including "model".
     get_data_list = function() {
-      data = reactiveValuesToList(self$data)
+      data <- reactiveValuesToList(self$data)
       data[names(data) != "model"]
     },
     
@@ -137,14 +137,14 @@ RegressionData = R6::R6Class(
     
     # Replace existing intercept with a new value, recompute line and squares.
     set_intercept = function(x) {
-      self$data[["model"]]$coefficients[[1]] = x
+      self$data[["model"]]$coefficients[[1]] <- x
       self$compute_line()
       self$compute_rects()
     },
     
     # Replace existing slope with a new value, recompute line and squares.
     set_slope = function(x) {
-      self$data[["model"]]$coefficients[[2]] = x
+      self$data[["model"]]$coefficients[[2]] <- x
       self$compute_line()
       self$compute_rects()
     },
@@ -170,8 +170,8 @@ RegressionData = R6::R6Class(
 )
 
 shake = function(x, sd) {
-  x = x + rnorm(length(x), sd = sd)
-  x = ifelse(x > 10, 10, x)
-  x = ifelse(x < 0, 0, x)
+  x <- x + rnorm(length(x), sd = sd)
+  x <- ifelse(x > 10, 10, x)
+  x <- ifelse(x < 0, 0, x)
   x
 }

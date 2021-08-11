@@ -1,6 +1,6 @@
-source("utils.R")
+source(here("src", "app", "utils", "utils.R"))
 
-sidebar = function() {
+sidebar <- function() {
   tags$div(
     class = "ui sidebar inverted vertical visible menu",
     style = "display:flex; flex-direction:column; margin:0;",
@@ -130,7 +130,7 @@ sidebar = function() {
 }
 
 
-body = function() {
+body <- function() {
   tags$div(
     style = "margin-left: 260px",
     tags$div(
@@ -146,7 +146,7 @@ body = function() {
   )
 }
 
-ui = function() {
+ui <- function() {
   shiny.semantic::semanticPage(
     tags$head(shiny::includeCSS("www/style.css")),
     shinyjs::useShinyjs(),

@@ -1,16 +1,16 @@
-source("utils.R")
-source("data.R")
+source(here("src", "app", "utils", "utils.R"))
+source(here("src", "app", "data.R"))
 
-server = function(input, output, session) {
-  data = RegressionData$new()
+server <- function(input, output, session) {
+  data <- RegressionData$new()
   
   # Update sum of squares in the UI.
   observe({
     error = data$get_error()
     if (is.null(error)) {
-      error = ""
+      error <- ""
     } else {
-      error = round(error, 3)
+      error <- round(error, 3)
     }
     shinyjs::html("ss", error)
   })
@@ -63,21 +63,22 @@ server = function(input, output, session) {
   })
   
   # Render D3 plot. All the logic is within `d3.js`
-  output$d3 = r2d3::renderD3({
-    r2d3::r2d3(
+  output$d3 <- renderD3({
+    r2d3(
       data = data_to_json(data$get_data_list()),
-      script = "d3.js"
+      script = here("src", "app", "www", "d3.js")
     )
   })
   
   # Create and open a modal when user clicks on how to use button.
   # It contains the content from `howto.md`.
   observeEvent(input$how_to, {
-    shiny.semantic::create_modal(shiny.semantic::modal(
-      id = "simple-modal",
-      header = tags$h2("How to use this app"),
-      includeMarkdown("howto.md")
-    ))
+    shiny.semantic::create_modal(
+      shiny.semantic::modal(
+        id = "simple-modal",
+        header = tags$h2("How to use this app"),
+        includeMarkdown(here("src", "app", "www", "howto.md"))
+      )
+    )
   })
-  
 }
